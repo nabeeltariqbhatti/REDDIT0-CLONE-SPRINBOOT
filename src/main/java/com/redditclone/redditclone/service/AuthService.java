@@ -24,16 +24,16 @@ public class AuthService {
 
 
     private static UUID uuid;
-    private static VerificationTokenRepository verificationTokenRepository;
+    private final VerificationTokenRepository verificationTokenRepository;
     private final  PasswordEncoder passwordEncoder;
 
 
-    private static  UserRepository userRepository;
+    private final   UserRepository userRepository;
 
 
     private final MailService mailService;
 
-    public static void verify(String token) throws SpringReddiException {
+    public  void verify(String token) throws SpringReddiException {
 
 
         Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
@@ -45,7 +45,7 @@ fetchUserAndEnable(verificationToken.get());
 
 
     @Transactional
-    private static void fetchUserAndEnable(VerificationToken verificationToken) throws SpringReddiException {
+    private void fetchUserAndEnable(VerificationToken verificationToken) throws SpringReddiException {
 
    String username =  verificationToken.getUser().getUsername();
 
