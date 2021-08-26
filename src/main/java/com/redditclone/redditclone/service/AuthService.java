@@ -12,8 +12,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -21,15 +23,39 @@ import java.util.UUID;
 public class AuthService {
 
 
-
+    private static UUID uuid;
+    private static VerificationTokenRepository verificationTokenRepository;
     private final  PasswordEncoder passwordEncoder;
 
 
-    private final UserRepository userRepository;
+    private static  UserRepository userRepository;
 
-    private final VerificationTokenRepository verificationTokenRepository;
+
     private final MailService mailService;
 
+    public static void verify(String token) throws SpringReddiException {
+
+
+        Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
+        verificationToken.orElseThrow(() -> new SpringReddiException("Invalid Token"));
+fetchUserAndEnable(verificationToken.get());
+
+
+    }
+
+
+    @Transactional
+    private static void fetchUserAndEnable(VerificationToken verificationToken) throws SpringReddiException {
+
+   String username =  verificationToken.getUser().getUsername();
+
+        User user = userRepository.findByUsername(username).orElseThrow(()->new SpringReddiException("Invalid User -" + username));
+        user.setEnabled(true);
+
+        userRepository.save(user);
+
+
+    }
 
 
     @Transactional
