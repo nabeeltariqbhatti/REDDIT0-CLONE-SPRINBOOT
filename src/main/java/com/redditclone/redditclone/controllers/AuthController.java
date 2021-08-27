@@ -1,6 +1,8 @@
 package com.redditclone.redditclone.controllers;
 
 
+import com.redditclone.redditclone.dto.AuthtenticationResponse;
+import com.redditclone.redditclone.dto.LoginRequest;
 import com.redditclone.redditclone.dto.RegisterRequest;
 import com.redditclone.redditclone.exceptions.SpringReddiException;
 import com.redditclone.redditclone.repository.UserRepository;
@@ -9,7 +11,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -42,6 +46,12 @@ public class AuthController {
         authService.verify(token);
 
         return ResponseEntity.ok().body("User Verified Successfully");
+    }
+
+    @PostMapping("/login")
+    public AuthtenticationResponse login(@RequestBody LoginRequest loginRequest ) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, SpringReddiException {
+
+        return authService.login(loginRequest);
     }
 
 

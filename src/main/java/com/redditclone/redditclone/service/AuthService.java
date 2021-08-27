@@ -1,6 +1,8 @@
 package com.redditclone.redditclone.service;
 
 
+import com.redditclone.redditclone.dto.AuthtenticationResponse;
+import com.redditclone.redditclone.dto.LoginRequest;
 import com.redditclone.redditclone.dto.RegisterRequest;
 import com.redditclone.redditclone.exceptions.SpringReddiException;
 import com.redditclone.redditclone.model.NotificationEmail;
@@ -8,12 +10,19 @@ import com.redditclone.redditclone.model.User;
 import com.redditclone.redditclone.model.VerificationToken;
 import com.redditclone.redditclone.repository.UserRepository;
 import com.redditclone.redditclone.repository.VerificationTokenRepository;
+import com.redditclone.redditclone.security.JwtProvider;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,8 +39,9 @@ public class AuthService {
 
     private final   UserRepository userRepository;
 
-
+    private final JwtProvider jwtProvider;
     private final MailService mailService;
+    private  final AuthenticationManager authenticationManager;
 
     public  void verify(String token) throws SpringReddiException {
 
@@ -85,5 +95,13 @@ fetchUserAndEnable(verificationToken.get());
 
 
 
+    }
+
+    public AuthtenticationResponse login(LoginRequest loginRequest) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, SpringReddiException {
+       Authentication authentication =  authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),loginRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+       String token = jwtProvider.generateToken(authentication);
+
+    return new AuthtenticationResponse(token, loginRequest.getUsername());
     }
 }
