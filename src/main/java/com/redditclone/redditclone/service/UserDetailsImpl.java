@@ -3,6 +3,9 @@ package com.redditclone.redditclone.service;
 import com.redditclone.redditclone.model.User;
 import com.redditclone.redditclone.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +18,10 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Data
+@Builder
+
+
 public class UserDetailsImpl implements UserDetailsService {
     private  final UserRepository userRepository;
     @Override

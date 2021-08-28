@@ -3,6 +3,7 @@ package com.redditclone.redditclone.security;
 
 
 import com.redditclone.redditclone.exceptions.SpringReddiException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,14 @@ public class JwtProvider {
             e.printStackTrace();
         }
 
+    }
+
+    public String getUsernameFromJwt(String token) throws SpringReddiException {
+        Claims claims = Jwts.parser().setSigningKey(getPublickey())
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
     }
 
 
