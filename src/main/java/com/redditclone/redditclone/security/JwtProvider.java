@@ -4,9 +4,7 @@ package com.redditclone.redditclone.security;
 
 import com.redditclone.redditclone.exceptions.SpringReddiException;
 import io.jsonwebtoken.Jwts;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -56,6 +54,19 @@ public class JwtProvider {
             return (PrivateKey) keyStore.getKey("springblog", "secret".toCharArray());
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
             throw new SpringReddiException("Exception occured while retrieving public key from keystore");
+        }
+    }
+
+    public boolean validateToken(String jwt) throws SpringReddiException {
+        Jwts.parser().setSigningKey(getPublickey()).parseClaimsJws(jwt);
+  return true;
+    }
+
+    private PublicKey getPublickey() throws SpringReddiException {
+        try {
+            return keyStore.getCertificate("springblog").getPublicKey();
+        } catch (KeyStoreException e) {
+            throw new SpringReddiException("Exception occured while " +"retrieving public key from keystore");
         }
     }
 
